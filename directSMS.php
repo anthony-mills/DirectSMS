@@ -10,6 +10,7 @@ class directSMS {
 	protected $_messageReference = NULL;
 	protected $_debugMode = TRUE;
 	protected $_connectionId = NULL;
+	protected $_messageType = '1-way';
 	
 	/**
 	 * Set the account credentials
@@ -21,7 +22,7 @@ class directSMS {
 	{
 		$this->_accountUsername = $accountUsername;
 		$this->_accountPassword = $accountPassword;
-		$connectionId = $this->_apiConnect();
+		$connectResult = $this->_apiConnect();
 	}
 	 
 	/**
@@ -32,8 +33,8 @@ class directSMS {
 	 */
 	public function setOriginNumber($messageOrigin) 
 	{
-		if ((is_numeric($messageOrigin)) && (strlen($messageOrigin) <= 10)) {
-			$this->_messageOrigin = $messageOrigin;
+		if (strlen($messageOrigin) <= 11) {
+			$this->_messageOrigin = urlencode($messageOrigin);
 			return TRUE;
 		}
 		return FALSE;	
@@ -81,13 +82,7 @@ class directSMS {
 	 */
 	public function sendMessage($messageRecipient)
 	{
-		$apiString = $this->_apiLocation . 'send_message?connectionid=' . $this->_connectionId . '&senderid' . $this->_messageOrigin;
-		
-		if (!empty($messageRecipient)) {
-			$apiString .= '&to=' . $messageRecipient;
-		} else {
-			return FALSE;
-		}
+		$apiString = $this->_apiLocation . 'send_message?connectionid=' . $this->_connectionId . '&senderid=' . $this->_messageOrigin . '&to=' . $messageRecipient . '&type=' . $this->_messageType;
 		
 		if (!empty($this->_messageReference)) {
 			$apiString .= '&messageid=' . $this->_messageReference;
@@ -113,7 +108,15 @@ class directSMS {
 	{
 		$apiString = $this->_apiLocation . 'connect?username=' . $this->_accountUsername . '&password=' . $this->_accountPassword;
 		
-		$connectResult = $this->_apiCommunicate($apiString);
+		$connectionId = $this->_apiCommunicate($apiString);
+		if (!empty($connectionId)) {
+			$connectionId = explode(': ', $connectionId);
+			if (strlen($connectionId[1]) == 34) {
+				$this->_connectionId = trim($connectionId[1]);
+				return TRUE;
+			}
+			throw new Exception('Unable to connect to API');
+		}
 		
 	}
 		
@@ -127,12 +130,14 @@ class directSMS {
 	{
 		$curlHandle = curl_init();
 		curl_setopt($curlHandle, CURLOPT_URL, $apiString);
-		
+		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, TRUE); 
 		$result = curl_exec($curlHandle);
 		if ($this->_debugMode) {
 			echo $apiString . '<br>';
 			print_r($result);
 		}
 		curl_close($curlHandle);
+		
+		return $result;
 	}
 }

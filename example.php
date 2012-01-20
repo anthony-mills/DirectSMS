@@ -3,13 +3,13 @@
 require_once('directSMS.php');
 
 // Set your directSMS username & password
-$accountUsername = 'accountusername';
-$accountPassword = 'accountpassword';
+$accountUsername = 'myusername';
+$accountPassword = 'mypassword';
 
 $directSMS = new directSMS($accountUsername, $accountPassword);
 
-$mySMS = 'A test sms message';
+$mySMS = 'mytestmsg';
 
 $directSMS->setMessageBody($mySMS);
 
-$directSMS->sendMessage('mymobilenumber');
+$directSMS->sendMessage('mobile number for msg');
