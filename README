@@ -1,5 +1,5 @@
 Basic PHP class to send SMS messages using the HTTP API @ directsms.com.au
 
---- Basic Usage ---
+## Basic Usage ##
 
 See example.php for an example of basic usage.

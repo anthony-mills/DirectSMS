@@ -1,4 +1,12 @@
 <?php
+/**
+ * DirectSMS API Wrapper
+ *
+ * @author Anthony Mills <me@anthony-mills.com>
+ * @link http://www.anthony-mills.com
+ * @license http://opensource.org/licenses/gpl-license.php GNU Public License V2
+ * @version 0.1
+ */
 class directSMS {
 	
 	protected $_apiLocation = 'http://api.directsms.com.au/s3/http/';
